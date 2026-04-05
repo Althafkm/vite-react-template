@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+
 const app = new Hono<{ Bindings: Env }>();
 
 // List of common search engine bots
@@ -11,24 +12,28 @@ const bots = [
   'YandexBot'
 ];
 
-// Middleware to detect bots
+// Middleware to detect bots and serve pre-rendered pages
 app.use('*', async (c, next) => {
-  const userAgent = c.req.headers.get('User-Agent') || '';
+  const userAgent = c.req.header('User-Agent') || '';
   const isBot = bots.some(bot => userAgent.includes(bot));
 
   if (isBot) {
-    // Serve pre-rendered HTML for bots
+    // Construct URL to fetch pre-rendered HTML
     const url = new URL(c.req.url);
     const prerenderedUrl = `https://auzzis.com${url.pathname}`;
+    
+    // Fetch the pre-rendered page
     const response = await fetch(prerenderedUrl);
+    
+    // Return the response to the bot
     return response;
   }
 
-  // Normal users go to React app
+  // Normal users continue to the React app
   await next();
 });
 
-// You can keep API routes here
+// Example API route
 app.get("/api/", (c) => c.json({ name: "Cloudflare" }));
 
 export default app;
