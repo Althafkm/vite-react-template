@@ -1,4 +1,4 @@
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -14,6 +14,7 @@ const bots = [
 
 // Middleware to detect bots
 app.use('*', async (c, next) => {
+  // Correct way to get a header in Hono
   const userAgent = c.req.header('User-Agent') || '';
   const isBot = bots.some(bot => userAgent.includes(bot));
 
@@ -30,8 +31,6 @@ app.use('*', async (c, next) => {
 });
 
 // Example API route
-app.get('/api/', (c) => {
-  return c.json({ name: 'Cloudflare' });
-});
+app.get("/api/", (c) => c.json({ name: "Cloudflare" }));
 
 export default app;
