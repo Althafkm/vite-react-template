@@ -3,7 +3,7 @@ import { Hono } from "hono";
 
 const app = new Hono<{ Bindings: Env }>();
 
-// List of common search engine bots
+// List of search engine bots
 const bots = [
   "Googlebot",
   "Bingbot",
@@ -15,7 +15,7 @@ const bots = [
 
 // Middleware to detect bots
 app.use("*", async (c, next) => {
-  const userAgent = c.req.header("User-Agent") || ""; // ✅ correct
+  const userAgent = c.req.header("User-Agent") || ""; // ✅ correct usage
   const isBot = bots.some(bot => userAgent.includes(bot));
 
   if (isBot) {
