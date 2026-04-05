@@ -1,35 +1,33 @@
+// src/worker/index.ts
 import { Hono } from "hono";
 
 const app = new Hono<{ Bindings: Env }>();
 
 // List of common search engine bots
 const bots = [
-  'Googlebot',
-  'Bingbot',
-  'Slurp',
-  'DuckDuckBot',
-  'Baiduspider',
-  'YandexBot'
+  "Googlebot",
+  "Bingbot",
+  "Slurp",
+  "DuckDuckBot",
+  "Baiduspider",
+  "YandexBot"
 ];
 
-// Middleware to detect bots and serve pre-rendered pages
-app.use('*', async (c, next) => {
-  const userAgent = c.req.header('User-Agent') || '';
+// Middleware to detect bots
+app.use("*", async (c, next) => {
+  const userAgent = c.req.header("User-Agent") || "";
   const isBot = bots.some(bot => userAgent.includes(bot));
 
   if (isBot) {
-    // Construct URL to fetch pre-rendered HTML
+    // Serve pre-rendered HTML for bots
     const url = new URL(c.req.url);
+    // Replace with your pre-rendered URL (or use the same domain if SSR is configured)
     const prerenderedUrl = `https://auzzis.com${url.pathname}`;
-    
-    // Fetch the pre-rendered page
     const response = await fetch(prerenderedUrl);
-    
-    // Return the response to the bot
     return response;
   }
 
-  // Normal users continue to the React app
+  // Normal users go to React app
   await next();
 });
 
