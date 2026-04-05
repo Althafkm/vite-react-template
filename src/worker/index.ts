@@ -14,16 +14,18 @@ const bots = [
 
 // Middleware to detect bots
 app.use('*', async (c, next) => {
-  const userAgent = c.req.header('User-Agent') || ''; // <-- fix here
+  const userAgent = c.req.header('User-Agent') || ''; // <-- fixed
   const isBot = bots.some(bot => userAgent.includes(bot));
 
   if (isBot) {
+    // Serve pre-rendered HTML for bots
     const url = new URL(c.req.url);
     const prerenderedUrl = `https://auzzis.com${url.pathname}`;
     const response = await fetch(prerenderedUrl);
     return response;
   }
 
+  // Normal users go to React app
   await next();
 });
 
