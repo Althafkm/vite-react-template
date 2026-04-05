@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Env } from "./env"; // <- import Env
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -14,19 +15,16 @@ const bots = [
 
 // Middleware to detect bots
 app.use('*', async (c, next) => {
-  // Correct way to get a header in Hono
   const userAgent = c.req.header('User-Agent') || '';
   const isBot = bots.some(bot => userAgent.includes(bot));
 
   if (isBot) {
-    // Serve pre-rendered HTML for bots
     const url = new URL(c.req.url);
     const prerenderedUrl = `https://auzzis.com${url.pathname}`;
     const response = await fetch(prerenderedUrl);
     return response;
   }
 
-  // Normal users go to React app
   await next();
 });
 
